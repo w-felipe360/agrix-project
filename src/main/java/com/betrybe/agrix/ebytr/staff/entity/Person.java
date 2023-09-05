@@ -8,13 +8,19 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 /**
  * Class representing a person.
  */
 @Entity
-public class Person {
+@Table(name = "people")
+public class Person implements UserDetails {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,12 +33,9 @@ public class Person {
   private String password;
 
   private Role role;
-  /**
-   * Constructor do Person.
-   */
 
+  /** construtor da classe Person. */
   public Person(Long id, String username, String password, Role role) {
-    super();
     this.id = id;
     this.username = username;
     this.password = password;
@@ -54,8 +57,38 @@ public class Person {
     return username;
   }
 
+  @Override
+  @JsonIgnore
+  public boolean isAccountNonExpired() {
+    return true;
+  }
+
+  @Override
+  @JsonIgnore
+  public boolean isAccountNonLocked() {
+    return true;
+  }
+
+  @Override
+  @JsonIgnore
+  public boolean isCredentialsNonExpired() {
+    return true;
+  }
+
+  @Override
+  @JsonIgnore
+  public boolean isEnabled() {
+    return true;
+  }
+
   public void setUsername(String username) {
     this.username = username;
+  }
+
+  @Override
+  @JsonIgnore
+  public Collection<? extends GrantedAuthority> getAuthorities() {
+    return List.of();
   }
 
   public String getPassword() {
