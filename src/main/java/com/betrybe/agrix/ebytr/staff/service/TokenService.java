@@ -9,31 +9,36 @@ import java.time.ZoneOffset;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-/**
- * Service Token with Generated.
- */
+/** service para geração de tokens JWT. */
 @Service
 public class TokenService {
 
   @Value("${api.security.token.secret}")
   private String secret;
 
-  /**
-     * Generate Token.
-     */
+  /** Gera um token JWT para um objeto Person. */
   public String generateToken(Person person) {
     Algorithm algorithm = Algorithm.HMAC256(secret);
     return JWT.create()
-                .withIssuer("agrix")
-                .withSubject(person.getUsername())
-                .withExpiresAt(generateExpirationDate())
-                .sign(algorithm);
+            .withIssuer("agrix")
+            .withSubject(person.getUsername())
+            .withExpiresAt(generateExpirationDate())
+            .sign(algorithm);
   }
 
   private Instant generateExpirationDate() {
     return LocalDateTime.now()
-                .plusHours(2)
-                .toInstant(ZoneOffset.of("-03:00"));
+            .plusHours(2)
+            .toInstant(ZoneOffset.of("-03:00"));
   }
 
+  /** Validação do token. */
+  public String validateToken(String token) {
+    Algorithm algorithm = Algorithm.HMAC256(secret);
+    return JWT.require(algorithm)
+            .withIssuer("agrix")
+            .build()
+            .verify(token)
+            .getSubject();
+  }
 }
